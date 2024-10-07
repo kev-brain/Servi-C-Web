@@ -7,7 +7,7 @@ define ("contraseña" , '');
 
 // //probamos la conexion con la base de datos
 // try {
-//     $gbd = new PDO(dsn, usuario, contraseña);
+//     $gbd = new PDO(dsn, usuario, contraseña); 
 //     echo "Conexion exitosa";
 // } catch (PDOException $e) {
 //     echo 'Falló la conexión: ' . $e->getMessage();
@@ -20,6 +20,7 @@ class database {
     // DEFINIMOS FUNCIÓN PARA ESTABLECER CONEXIÓN DB
     function __construct($dsn, $usuario, $contraseña) {
         $this -> gbd = new PDO($dsn, $usuario, $contraseña);
+        $this->gbd->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         if (!$this->gbd) {
             throw new Exception("No se ha podido realizar la conexión.\n\n
@@ -30,13 +31,21 @@ class database {
     // ********************** CONSULTAS SQL BÁSICAS **********************
     
     // DEFINIMOS FUNCIÓN SELECT PARA EXTRAER DATOS DE LA BASE DE DATOS
-    function select($tabla, array $columns = null, $join = null, $condicion = null, $arr_prepare = null, $order = null, $limit = null) {
-        $columnSelection = '*';
+    function select($tabla, array $columns = null, $joins = [], $condicion = null, $arr_prepare = null, $order = null, $limit = null) {
 
+        if ($columns != null) {
+            $columnSelection = implode(", ", $columns);
+        }else{
+            $columnSelection = '*';
+        }
+
+        
         $sql = "SELECT " . $columnSelection . " FROM " . $tabla;
 
-        if ($join != null) {
-            $sql .= " INNER JOIN " . $join;
+        if (!empty($joins)) {
+            foreach ($joins as $join) {
+                $sql .= " INNER JOIN " . $join['tabla'] . " ON " . $join['condicion'];
+            }
         }
         if ($condicion != null) {
             $sql .= " WHERE " . $condicion;
@@ -70,7 +79,7 @@ class database {
         $recurso -> execute($arr_prepare);
         
         if ($recurso) {
-            return $recurso->fetchAll(PDO::FETCH_ASSOC);
+            return $recurso->rowCount(); // Retorna el número de filas afectadas
         } else {
             echo '<pre>';
             print_r($this->gbd->errorInfo());
@@ -88,8 +97,7 @@ class database {
         $recurso -> execute($arr_prepare);
 
         if ($recurso) {
-            $this -> gbd -> lastInsertId();
-            return $recurso -> fetchAll(PDO::FETCH_ASSOC);
+            return $this->gbd->lastInsertId();   
         }
         else {
             echo '<pre>';
@@ -101,21 +109,24 @@ class database {
     }
 
     // DEFINIMOS FUNCIÓN UPDATE PARA MODIFICAR DATOS EXISTENTES EN LA BASE DE DATOS
-    function update($tabla, $campo, $valor, $condicion, $arr_prepare = null) {
-        $sql = "UPDATE " . $tabla . " SET " . $campo . ' = ' . $valor . " WHERE " . $condicion;
+    function update($tabla, $campo_valor, $condicion, $arr_prepare = null) {
+        $sql = "UPDATE " . $tabla . " SET " . $campo_valor . " WHERE " . $condicion;
 
         $recurso = $this -> gbd -> prepare($sql);
-        $recurso -> execute($arr_prepare);
+        $recurso->execute($arr_prepare);
+        //  echo '<pre>';
+        //      print_r($sql).print_r($arr_prepare);
+        //      echo '</pre>';
 
-        if ($recurso) {
-            return $recurso -> fetchAll(PDO::FETCH_ASSOC);
-        }
-        else {
-            echo '<pre>';
-            print_r($this -> gbd -> errorInfo());
-            echo '</pre>';
+         if ($recurso) {
+             return $recurso->rowCount();
+         }
+         else {
+             echo '<pre>';
+             print_r($this -> gbd -> errorInfo());
+             echo '</pre>';
 
-            throw new Exception('Error al actualizar los datos.');
-        }
+             throw new Exception('Error al actualizar los datos.');
+         }
     }
 }

@@ -1,5 +1,5 @@
 // validacioanes para el formulario de solicitud de servicio //
-async function validarSolicitud(event) {
+export async function validarSolicitud(event) {
     console.log("se esta ejecutando la validacion")
     event.preventDefault(); // Evita el envío del formulario hasta que se valide
     
