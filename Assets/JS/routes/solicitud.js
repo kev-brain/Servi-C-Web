@@ -1,7 +1,9 @@
 export const solicitud =  
     `<section id="solicitud">
         <h2>Solicitud de Servicios</h2>
-        <form method="POST" class="formulario" onsubmit="validarSolicitud(event)">
+        <form method="POST" class="formulario" id="formSolicitud" action="../../backend/solicitud_servicio.php" >
+            <input type="hidden" name="acciones" value="Enviar Solicitud">
+
             <label for="nombre">Nombre:</label><br>
             <input type="text" id="nombre" name="nombre"><br>
     
@@ -34,8 +36,10 @@ export const solicitud =
                   <option value="Aurora">Aurora</option>
                   <option value="Bosch">Bosch</option>
                   <option value="Candy">Candy</option>
+                  <option value="Carrier">Carrier</option>
                   <option value="Columbia">Columbia</option>
                   <option value="Coventry">Coventry</option>
+                  <option value="Drean">Drean</option>
                   <option value="Electrolux">Electrolux</option>
                   <option value="Eslavon de lujo">Eslavon de lujo</option>
                   <option value="Gafa">Gafa</option>
@@ -49,6 +53,7 @@ export const solicitud =
                   <option value="Philco">Philco</option>
                   <option value="Philips">Philips</option>
                   <option value="Samsung">Samsung</option>
+                  <option value="Surrey">Surrey</option>
                   <option value="Whirlpool">Whirlpool</option>
                   <option value="Whitte-westinghouse">Whitte-westinghouse</option>
                   <option value="Otra">Otra</option>
@@ -60,6 +65,6 @@ export const solicitud =
               <label for="Falla">Falla:</label><br>
               <textarea id="Falla" name="Falla" placeholder="¿Cuál es la falla que le hace el electrodomestico?"></textarea><br>
               
-              <boton ><input type="submit" value="Enviar Solicitud"></boton>
+              <button type="submit" class="btnEnviar"> Enviar solicitud </button>
         </form>
     </section>`;
